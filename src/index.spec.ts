@@ -14,33 +14,30 @@ describe('ts-transform-asset', function() {
     testName: string,
     mainFile: string,
     path?: string
-  ): boolean {
-    return compile(
-      testName,
-      [
-        resolve(__dirname, `../test/${mainFile}.ts`),
-        resolve(__dirname, '../test/global.d.ts')
-      ],
-      '\\.svg$',
-      path
-    )
+  ): void {
+    const files: string[] = [
+      resolve(__dirname, `../test/${mainFile}.ts`),
+      resolve(__dirname, '../test/global.d.ts')
+    ]
+    compile(testName, files, '\\.svg$', path)
   }
 
   it('should be able to compile asset to root path', function() {
-    expect(compileFile('root', 'success')).to.be.true
-    expect(require('../dist/test/root/success.js').default()).to.equal(
+    compileFile('root', 'success')
+    expect(require('../dist/test/root/success').default()).to.equal(
       'image.svg'
     )
   })
 
   it('should be able to compile asset to given path', function() {
-    expect(compileFile('path', 'success', 'assets')).to.be.true
-    expect(require('../dist/test/path/success.js').default()).to.equal(
+    compileFile('path', 'success', 'assets')
+    expect(require('../dist/test/path/success').default()).to.equal(
       'assets/image.svg'
     )
   })
 
-  it('should fail to compile bad files', function() {
-    expect(compileFile('fail', 'failure')).to.be.false
+  it('should fail to execute bad files', function() {
+    compileFile('fail', 'failure')
+    expect(() => require('../dist/test/fail/failure')).to.throw()
   })
 })

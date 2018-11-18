@@ -50,21 +50,18 @@ function buildVisitor(ctx: TransformationContext, opts: Opts) {
       return visitEachChild(node, visitor, ctx)
     }
 
-    // Extract variable name
-    let importVar: string | undefined
+    // Check if import with namespace
     if (
-      importClause.namedBindings &&
-      isNamespaceImport(importClause.namedBindings)
+      !importClause.namedBindings ||
+      !isNamespaceImport(importClause.namedBindings)
     ) {
-      importVar = importClause.namedBindings.name.getText()
-    } else if (!importClause.namedBindings && importClause.name) {
-      importVar = importClause.name.getText()
-    }
-    if (!importVar) {
       return visitEachChild(node, visitor, ctx)
     }
 
     // Create replacement
+    const importVar:
+      | string
+      | undefined = importClause.namedBindings.name.getText()
     return createVariableStatement(
       undefined,
       createVariableDeclarationList(
