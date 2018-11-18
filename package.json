@@ -1,6 +1,6 @@
 {
   "name": "ts-transform-asset",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Typescript transformer used to convert asset imports to file names",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
