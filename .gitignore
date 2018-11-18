@@ -1,0 +1,16 @@
+node_modules/
+dist/
+
+# Test results
+test/*.js
+
+# Coverage
+.nyc_output/
+coverage/
+
+# Yarn
+yarn-error.log
+yarn.lock
+
+# VS code
+.vscode/
