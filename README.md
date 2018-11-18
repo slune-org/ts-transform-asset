@@ -1,12 +1,10 @@
 [![npm package](https://badge.fury.io/js/ts-transform-asset.svg)](https://www.npmjs.com/package/ts-transform-asset)
 [![license](https://img.shields.io/github/license/sveyret/ts-transform-asset.svg)](https://github.com/sveyret/ts-transform-asset/blob/master/LICENSE)
-[![build](https://api.travis-ci.org/sveyret/ts-transform-asset.svg?branch=master)](https://travis-ci.org/sveyret/ts-transform-asset)
+[![build](https://travis-ci.com/sveyret/ts-transform-asset.svg?branch=master)](https://travis-ci.com/sveyret/ts-transform-asset)
 [![coverage](https://coveralls.io/repos/github/sveyret/ts-transform-asset/badge.svg?branch=master)](https://coveralls.io/github/sveyret/ts-transform-asset)
 [![issues](https://img.shields.io/github/issues/sveyret/ts-transform-asset.svg)](https://github.com/sveyret/ts-transform-asset/issues)
 
 # ts-transform-asset - Typescript transformer for asset imports
-
-## Pupose
 
 This transformer will simply convert an import like:
 
@@ -20,13 +18,13 @@ to:
 const foo = "assets/bar.png";
 ```
 
-## But why would I need that?
+# Language/langue
 
-Imagine you have a project creating some web pages. This project is packed with `Webpack`, creating a `bundle.js`. In the same time, the `Webpack` `file-loader` plugin is moving all assets into the target directory. This is done by setting some `import * as foo from '../images/bar.png` for your assets in source code.
+Because French is my native language, finding all documents and messages in French is not an option. Other translations are welcome.
 
-Then, you have another project, which contains the web server. This server, which depends on the previous one, will take all assets and bundle to serve them to the clients. But you also want to do some server side rendering. And for this, you prefer using the transpiled `javascript` and definition files instead of the minified and untyped bundle. But this is not working, because your server do not know what to do with your assets files.
+Anyway, because English is the language of programming, the code, including variable names and comments, are in English.
 
-Using this transformer to transpile the web pages (not for `Webpack`!), you will convert your imports into constants with the URL of where resources should be found, and dependents project will be able to work without any more configuration.
+:fr: Une version française de ce document se trouve [ici](doc/fr/README.md).
 
 # Installation
 
@@ -42,13 +40,13 @@ If you prefer using `yarn`:
 $ yarn add --dev ts-transform-asset
 ```
 
-# Language/langue
+# Why would I need that?
 
-Because French is my native language, finding all documents and messages in French is not an option. Other translations are welcome.
+Imagine you have a project creating some web pages. This project is packed with `Webpack`, creating a `bundle.js`. In the same time, the `Webpack` `file-loader` plugin is moving all assets into the target directory. This is done by setting some `import * as foo from '../images/bar.png` for your assets in source code.
 
-Anyway, because English is the language of programming, the code, including variable names and comments, are in English.
+Then, you have another project, which contains the web server. This server, which depends on the previous one, will take all assets and bundle to serve them to the clients. But you also want to do some server side rendering. And for this, you prefer using the transpiled `javascript` and definition files instead of the minified and untyped bundle. But this is not working, because your server do not know what to do with your assets files.
 
-:fr: Une version française de ce document se trouve [ici](doc/fr/README.md).
+Using this transformer to transpile the web pages (not for `Webpack`!), you will convert your imports into constants with the URL of where resources should be found, and dependents project will be able to work without any more configuration.
 
 # Usage
 

@@ -1,7 +1,5 @@
 # ts-transform-asset - Transformateur typescript pour l'import des fichiers annexes
 
-## Objectif
-
 Ce transformateur se content de convertir les imports tel que :
 
 ```typescript
@@ -14,13 +12,11 @@ en :
 const foo = "assets/bar.png";
 ```
 
-## Mais pourquoi aurai-je besoin de ça ?
+# Langue
 
-Imaginez que vous avez un projet qui crée des pages web. Ce projet est empaqueté avec `Webpack`, qui génère un `bundle.js`. Durant ce processus, l'extension `file-loader` de `Webpack` déplace les fichiers annexes dans le répertoire de destination. Ceci est fait en indiquant des `import * as foo from '../images/bar.png` pour ces fichiers annexes dans le code source.
+Le français étant ma langue maternelle, fournir les documents et messages en français n'est pas une option. Les autres traductions sont bienvenues.
 
-Imaginez maintenant que vous avez un autre projet qui contient le serveur web. Ce serveur, qui dépend du projet précédent, prendra tous ces fichiers annexes ainsi que le paquet `bundle.js` pour servir les clients. Mais vous voulez également faire du rendu côté serveur. Pour cela, vous préférez utiliser la version transpilée avec les fichiers `javascript` et de définition plutôt que le paquet minimisé et sans type. Sauf que cela ne fonctionne pas car le serveur ne sait pas quoi faire des imports définis dans les pages web.
-
-L'utilisation de ce transformateur pour transpiler les pages web (pas pour `Webpack` !) convertira ces imports en constantes contenant l'URL où les ressources peuvent être trouvées, et les projets dépendants fonctionneront sans plus de configuration.
+Cependant, l'anglais étant la langue de la programmation, le code, y compris les noms de variable et commentaires, sont en anglais.
 
 # Installation
 
@@ -36,11 +32,13 @@ Si vous préférez utiliser `yarn` :
 $ yarn add --dev ts-transform-asset
 ```
 
-# Langue
+# Pourquoi aurai-je besoin de ça ?
 
-Le français étant ma langue maternelle, fournir les documents et messages en français n'est pas une option. Les autres traductions sont bienvenues.
+Imaginez que vous avez un projet qui crée des pages web. Ce projet est empaqueté avec `Webpack`, qui génère un `bundle.js`. Durant ce processus, l'extension `file-loader` de `Webpack` déplace les fichiers annexes dans le répertoire de destination. Ceci est fait en indiquant des `import * as foo from '../images/bar.png` pour ces fichiers annexes dans le code source.
 
-Cependant, l'anglais étant la langue de la programmation, le code, y compris les noms de variable et commentaires, sont en anglais.
+Imaginez maintenant que vous avez un autre projet qui contient le serveur web. Ce serveur, qui dépend du projet précédent, prendra tous ces fichiers annexes ainsi que le paquet `bundle.js` pour servir les clients. Mais vous voulez également faire du rendu côté serveur. Pour cela, vous préférez utiliser la version transpilée avec les fichiers `javascript` et de définition plutôt que le paquet minimisé et sans type. Sauf que cela ne fonctionne pas car le serveur ne sait pas quoi faire des imports définis dans les pages web.
+
+L'utilisation de ce transformateur pour transpiler les pages web (pas pour `Webpack` !) convertira ces imports en constantes contenant l'URL où les ressources peuvent être trouvées, et les projets dépendants fonctionneront sans plus de configuration.
 
 # Utilisation
 
