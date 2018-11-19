@@ -4,6 +4,10 @@
   "description": "Typescript transformer used to convert asset imports to file names",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sveyret/ts-transform-asset.git"
+  },
   "scripts": {
     "watch": "npm-watch test",
     "prepublishOnly": "npm run chain",
