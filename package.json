@@ -1,6 +1,6 @@
 {
   "name": "ts-transform-asset",
-  "version": "1.0.1",
+  "version": "2.0.0",
   "description": "Typescript transformer used to convert asset imports to file names",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -9,15 +9,16 @@
     "url": "git+https://github.com/sveyret/ts-transform-asset.git"
   },
   "scripts": {
-    "watch": "npm-watch test",
-    "prepublishOnly": "npm run chain",
-    "chain": "npm run clean && npm run test && npm run build",
-    "build": "npm run transpile",
-    "test": "npm run lint && npm run testUnit",
-    "lint": "tslint src/**/*.ts",
-    "testUnit": "nyc mocha --require ts-node/register --require source-map-support/register 'src/**/*.spec.ts'",
+    "prepublishOnly": "npm run all",
+    "all": "npm run clean && npm run test && npm run build",
+    "build": "npm run build:typescript",
+    "build:typescript": "tsc",
+    "test": "npm run test:lint && npm run test:unit",
+    "test:lint": "tslint 'src/**/*.ts'",
+    "test:unit": "nyc mocha --require ts-node/register --require source-map-support/register 'src/**/*.spec.ts'",
     "clean": "rimraf dist",
-    "transpile": "tsc"
+    "debug": "npm run debug:watch",
+    "debug:watch": "npm-watch test"
   },
   "nyc": {
     "extension": [
@@ -56,15 +57,15 @@
     "typescript": "^3.0.0"
   },
   "devDependencies": {
-    "@types/chai": "4.1.7",
-    "@types/mocha": "5.2.5",
-    "@types/node": "10.12.9",
+    "@types/chai": "4.2.6",
+    "@types/mocha": "5.2.7",
+    "@types/node": "12.12.16",
     "chai": "4.2.0",
-    "mocha": "5.2.0",
-    "nyc": "13.1.0",
-    "rimraf": "2.6.2",
-    "ts-node": "7.0.1",
-    "tslint": "5.11.0",
-    "typescript": "3.1.6"
+    "mocha": "6.2.2",
+    "nyc": "14.1.1",
+    "rimraf": "3.0.0",
+    "ts-node": "8.5.4",
+    "tslint": "5.20.1",
+    "typescript": "3.7.3"
   }
 }

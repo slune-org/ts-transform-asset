@@ -1,7 +1,9 @@
 import './image.svg'
-import image from './image.svg'
-import * as error from './non-matching.png'
+import * as error from './non-matching.bmp'
 
 export default function getData() {
-  return { image, error }
+  return error
 }
+
+export { ogg as sound } from './sound.ogg'
+export * from './skip.ogg'

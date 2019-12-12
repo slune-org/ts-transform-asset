@@ -36,12 +36,10 @@ export default function compile(
   const program = createProgram(input, options, compilerHost)
 
   const emitResult = program.emit(undefined, undefined, undefined, undefined, {
-    before: [transform({ assetsMatch, targetPath })],
+    before: [transform(program, { assetsMatch, targetPath })],
   })
 
-  const allDiagnostics = getPreEmitDiagnostics(program).concat(
-    emitResult.diagnostics
-  )
+  const allDiagnostics = getPreEmitDiagnostics(program).concat(emitResult.diagnostics)
 
   allDiagnostics.forEach(diagnostic => {
     const { line, character } = diagnostic.file

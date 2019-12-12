@@ -1,15 +1,22 @@
 # ts-transform-asset - Transformateur typescript pour l'import des fichiers annexes
 
-Ce transformateur se content de convertir les imports tel que :
+Ce transformateur se contente de convertir les imports tel que :
 
 ```typescript
-import * as foo from "../images/bar.png";
+import foo from './images/foo.gif'
+import * as bar from '../images/bar.png'
+export { default } from './foobar.svg'
+export { default as foobar } from './foobar.ico'
 ```
 
 en :
 
 ```typescript
-const foo = "assets/bar.png";
+const foo = 'assets/foo.gif'
+const bar = 'assets/bar.png'
+const foobar_svg_1 = 'assets/foobar.svg'
+export default foobar_svg_1
+export const foobar = 'assets/foobar.ico'
 ```
 
 # Langue
@@ -34,9 +41,11 @@ $ yarn add --dev ts-transform-asset
 
 # Pourquoi aurai-je besoin de ça ?
 
-Imaginez que vous avez un projet qui crée des pages web. Ce projet est empaqueté avec `Webpack`, qui génère un `bundle.js`. Durant ce processus, l'extension `file-loader` de `Webpack` déplace les fichiers annexes dans le répertoire de destination. Ceci est fait en indiquant des `import * as foo from '../images/bar.png` pour ces fichiers annexes dans le code source.
+Vous avez un projet empaqueté avec `Webpack` et l'extension `file-loader`. Lorsque cette extension trouve un `import foo from "./images/foo.gif"`, elle copie `foo.gif` vers un répertoire de fichiers annexes et modifie l'utilisation de `foo` en utilisant le chemin public vers le fichier. Bien.
 
-Imaginez maintenant que vous avez un autre projet qui contient le serveur web. Ce serveur, qui dépend du projet précédent, prendra tous ces fichiers annexes ainsi que le paquet `bundle.js` pour servir les clients. Mais vous voulez également faire du rendu côté serveur. Pour cela, vous préférez utiliser la version transpilée avec les fichiers `javascript` et de définition plutôt que le paquet minimisé et sans type. Sauf que cela ne fonctionne pas car le serveur ne sait pas quoi faire des imports définis dans les pages web.
+Maintenant, vous avez un autre projet qui contient le serveur web. Ce serveur, qui dépend du projet précédent, prendra le paquet généré et tous ces fichiers annexes pour les servir aux clients. Mais vous voulez également faire du rendu côté serveur (SSR). Et pour cela, vous ne pouvez pas utiliser le paquet généré par `Webpack` parce qu'il n'a pas un point d'entré approprié pour le serveur (il utilise un `BrowserRouter` au lieu d'un `StaticRouter`, par exemple). Ou peut-être préférez-vous utiliser la version transpilée avec les fichiers `javascript` et les fichiers de définition plutôt que le paquet minimisé et sans type.
+
+Malheureusement, cela ne fonctionne pas car le serveur ne sait pas quoi faire des imports de fichiers annexes.
 
 L'utilisation de ce transformateur pour transpiler les pages web (pas pour `Webpack` !) convertira ces imports en constantes contenant l'URL où les ressources peuvent être trouvées, et les projets dépendants fonctionneront sans plus de configuration.
 
@@ -73,7 +82,6 @@ Ensuite, configurez votre `tsconfig.json`
     "plugins": [
       {
         "transform": "ts-transform-asset",
-        "type": "config",
         "assetsMatch": "\\.png$",
         "targetPath": "assets"
       }
@@ -81,3 +89,70 @@ Ensuite, configurez votre `tsconfig.json`
   }
 }
 ```
+
+## Code source
+
+Votre code source TypeScript devrait déjà être correctement écrit si vous utilisez `Webpack` et le `file-loader`. Dans le cas contraire, vous pouvez suivre les instructions ci-dessous.
+
+### Déclaration des modules
+
+Avant de pouvoir les utiliser, vous devez déclarer les nouveaux types de modules, dans un fichier `assets.d.ts`, par exemple :
+
+```typescript
+declare module '*.png' {
+  const content: string
+  export default content
+}
+```
+
+Les anciennes versions de `file-loader` (avant la 5.0.2) n'utilisaient pas d'export par défaut. Les types de modules doivent plutôt être déclarés ainsi dans ce cas :
+
+```typescript
+declare module '*.png' {
+  const content: string
+  export = content
+}
+```
+
+### Import des fichiers annexes
+
+Lorsque le fichier (module) doit être utilisé :
+
+```typescript
+import image from './image.png'
+
+const url: string = image
+```
+
+Il est également possible de ré-exporter les fichiers annexes :
+
+```typescript
+export { default as image } from './image.png'
+```
+
+Puis, dans un autre fichier :
+
+```typescript
+import { image } from '../images'
+
+const url: string = image
+```
+
+Pour les anciennes versions de `file-loader` (avant la 5.0.2), seul l'import d'espace de nom est possible :
+
+```typescript
+import * as image from './image.png'
+
+const url: string = image
+```
+
+# Notes
+
+- Le transformateur ne détectera ni ne modifiera aucune instruction `require`. Il est conseillé de l'exécuter dans la phase de compilation `before`, avant que le code soit convertit dans une version plus ancienne d'`ECMAScript`.
+- Le transformateur modifie le code s'il est conforme à ce qui est attendu, ou ne le touche pas du tout. Il y a toutefois une exception pour les déclarations de ré-exports : si le module source correspond aux paramètres donnés mais que la propriété exportée n'est pas `default`, alors cet propriété sera supprimée.
+- Merci d'ouvrir un incident si vous avez un problème à l'utilisation de ce transformateur. Même si je ne peux pas garantir de délai de réponse, je ferai de mon mieux pour corriger les problèmes et répondre aux questions.
+- Les contributions sont bien sûr bienvenues.
+
+# Migration
+
+Notez que dans les versions 1.x.x, le transformateur était de type `config`. Depuis la version 2.0.0, le transformateur est de type `program`, qui est le type par défaut. Si vous mettez à jour depuis une version plus ancienne et que vous utilisez `ttypescript`, vous devrez mettre à jour la configuration du `plugin` dans `tsconfig.json`.

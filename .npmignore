@@ -6,6 +6,7 @@ tslint.yaml
 
 # Tests
 dist/**/*.spec.*
+dist/test/
 
 # Coverage
 .nyc_output/

@@ -1,87 +1,70 @@
-import { basename, join } from 'path'
 import {
-  ImportClause,
   Node,
-  NodeFlags,
+  Program,
   SourceFile,
   TransformationContext,
   Transformer,
   TransformerFactory,
+  TypeChecker,
   Visitor,
-  createLiteral,
-  createVariableDeclaration,
-  createVariableDeclarationList,
-  createVariableStatement,
-  isImportDeclaration,
-  isNamespaceImport,
   visitEachChild,
   visitNode,
 } from 'typescript'
 
-export interface Opts {
-  assetsMatch: string
+import AssetModuleManager from './AssetModuleManager'
+import DeclarationNodeFinder from './DeclarationNodeFinder'
+import ExportVisitor from './ExportVisitor'
+import IdentifierVisitor from './IdentifierVisitor'
+import ImportVisitor from './ImportVisitor'
+import NodeVisitor from './NodeVisitor'
+import PluginConfig from './PluginConfig'
+
+function buildVisitor(
+  typeChecker: TypeChecker,
+  ctx: TransformationContext,
+  assetsMatch: RegExp,
   targetPath?: string
-}
+) {
+  const modifiedImports: Node[] = []
+  const declarationNode = new DeclarationNodeFinder(typeChecker)
+  const moduleManager = new AssetModuleManager(assetsMatch, targetPath)
+  const allVisitors: Array<NodeVisitor<Node>> = [
+    new ImportVisitor(declarationNode, moduleManager, modifiedImports),
+    new ExportVisitor(moduleManager),
+    new IdentifierVisitor(declarationNode, modifiedImports),
+  ]
 
-function buildVisitor(ctx: TransformationContext, opts: Opts) {
-  const matcher: RegExp = new RegExp(opts.assetsMatch)
-  const visitor: Visitor = (node: Node): Node => {
-    // Continue only for import nodes
-    if (!isImportDeclaration(node)) {
-      return visitEachChild(node, visitor, ctx)
-    }
-
-    // Extract module name and remove quotes
-    let moduleName: string = node.moduleSpecifier.getText()
-    moduleName = moduleName.substring(1, moduleName.length - 1)
-
-    // Continue only if matching assets pattern
-    if (!matcher.test(moduleName)) {
-      return visitEachChild(node, visitor, ctx)
-    }
-
-    // Convert file name
-    moduleName = basename(moduleName)
-    opts.targetPath && (moduleName = join(opts.targetPath, moduleName))
-
-    // Get the import clause, and continue only if existing
-    const importClause: ImportClause | undefined = node.importClause
-    if (!importClause) {
-      return visitEachChild(node, visitor, ctx)
-    }
-
-    // Check if import with namespace
-    if (
-      !importClause.namedBindings ||
-      !isNamespaceImport(importClause.namedBindings)
-    ) {
-      return visitEachChild(node, visitor, ctx)
-    }
-
-    // Create replacement
-    const importVar:
-      | string
-      | undefined = importClause.namedBindings.name.getText()
-    return createVariableStatement(
-      undefined,
-      createVariableDeclarationList(
-        [
-          createVariableDeclaration(
-            importVar,
-            undefined,
-            createLiteral(moduleName)
-          )
-        ],
-        NodeFlags.Const
-      )
+  const visitor: Visitor = (node: Node): undefined | Node | Node[] => {
+    const newNodes = allVisitors.reduce(
+      (nodes, nodeVisitor) => {
+        return visit(nodeVisitor, nodes)
+      },
+      [node]
     )
+    return newNodes.length === 0
+      ? undefined
+      : newNodes.length === 1
+      ? visitEachChild(newNodes[0], visitor, ctx)
+      : newNodes.map(newNode => visitEachChild(newNode, visitor, ctx))
+  }
+
+  function visit<T extends Node>(nodeVisitor: NodeVisitor<T>, nodes: Node[]): Node[] {
+    const nextNodes: Node[] = []
+    nodes.forEach(node => {
+      if (nodeVisitor.wantNode(node)) {
+        nextNodes.push(...nodeVisitor.visit(node))
+      } else {
+        nextNodes.push(node)
+      }
+    })
+    return nextNodes
   }
 
   return visitor
 }
 
-export default function(opts: Opts): TransformerFactory<SourceFile> {
-  return (ctx: TransformationContext): Transformer<SourceFile> => (
-    sf: SourceFile
-  ) => visitNode(sf, buildVisitor(ctx, opts))
+export default function(program: Program, pluginConfig: PluginConfig): TransformerFactory<SourceFile> {
+  const assetsMatch: RegExp = new RegExp(pluginConfig.assetsMatch)
+  return (ctx: TransformationContext): Transformer<SourceFile> => (sf: SourceFile) =>
+    visitNode(sf, buildVisitor(program.getTypeChecker(), ctx, assetsMatch, pluginConfig.targetPath))
 }

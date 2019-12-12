@@ -10,34 +10,27 @@ describe('ts-transform-asset', function() {
   this.slow(2000)
   this.timeout(10000)
 
-  function compileFile(
-    testName: string,
-    mainFile: string,
-    path?: string
-  ): void {
-    const files: string[] = [
-      resolve(__dirname, `../test/${mainFile}.ts`),
-      resolve(__dirname, '../test/global.d.ts')
-    ]
-    compile(testName, files, '\\.svg$', path)
+  function compileFile(testName: string, path?: string): void {
+    const files: string[] = [resolve(__dirname, '../test/global.d.ts')]
+    files.push(...['success', 'failure', 'reexport'].map(name => resolve(__dirname, `../test/${name}.ts`)))
+    compile(testName, files, '\\.(png|svg|ogg)$', path)
   }
 
   it('should be able to compile asset to root path', function() {
-    compileFile('root', 'success')
-    expect(require('../dist/test/root/success').default()).to.equal(
-      'image.svg'
-    )
+    compileFile('root')
+    expect(require('../dist/test/root/success').default('png')).to.equal('image.png')
+    expect(require('../dist/test/root/success').default('svg')).to.equal('image.svg')
+    expect(require('../dist/test/root/success').default('defaultExport')).to.equal('image.svg')
+    expect(require('../dist/test/root/success').default('export')).to.equal('image.svg')
+    expect(() => require('../dist/test/root/failure')).to.throw()
   })
 
   it('should be able to compile asset to given path', function() {
-    compileFile('path', 'success', 'assets')
-    expect(require('../dist/test/path/success').default()).to.equal(
-      'assets/image.svg'
-    )
-  })
-
-  it('should fail to execute bad files', function() {
-    compileFile('fail', 'failure')
-    expect(() => require('../dist/test/fail/failure')).to.throw()
+    compileFile('path', 'assets')
+    expect(require('../dist/test/path/success').default('png')).to.equal('assets/image.png')
+    expect(require('../dist/test/path/success').default('svg')).to.equal('assets/image.svg')
+    expect(require('../dist/test/path/success').default('defaultExport')).to.equal('assets/image.svg')
+    expect(require('../dist/test/path/success').default('export')).to.equal('assets/image.svg')
+    expect(() => require('../dist/test/path/failure')).to.throw()
   })
 })
