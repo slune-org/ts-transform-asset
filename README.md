@@ -1,8 +1,8 @@
 [![npm package](https://badge.fury.io/js/ts-transform-asset.svg)](https://www.npmjs.com/package/ts-transform-asset)
-[![license](https://img.shields.io/github/license/sveyret/ts-transform-asset.svg)](https://github.com/sveyret/ts-transform-asset/blob/master/LICENSE)
-[![build](https://travis-ci.com/sveyret/ts-transform-asset.svg?branch=master)](https://travis-ci.com/sveyret/ts-transform-asset)
-[![coverage](https://coveralls.io/repos/github/sveyret/ts-transform-asset/badge.svg?branch=master)](https://coveralls.io/github/sveyret/ts-transform-asset)
-[![issues](https://img.shields.io/github/issues/sveyret/ts-transform-asset.svg)](https://github.com/sveyret/ts-transform-asset/issues)
+[![license](https://img.shields.io/github/license/slune-org/ts-transform-asset.svg)](https://github.com/slune-org/ts-transform-asset/blob/master/LICENSE)
+[![build](https://travis-ci.org/slune-org/ts-transform-asset.svg?branch=master)](https://travis-ci.com/slune-org/ts-transform-asset)
+[![Coverage Status](https://coveralls.io/repos/github/slune-org/ts-transform-asset/badge.svg?branch=master)](https://coveralls.io/github/slune-org/ts-transform-asset?branch=master)
+[![issues](https://img.shields.io/github/issues/slune-org/ts-transform-asset.svg)](https://github.com/slune-org/ts-transform-asset/issues)
 
 # ts-transform-asset - Typescript transformer for asset imports
 
