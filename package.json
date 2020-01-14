@@ -1,12 +1,12 @@
 {
   "name": "ts-transform-asset",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "Typescript transformer used to convert asset imports to file names",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/sveyret/ts-transform-asset.git"
+    "url": "git+https://github.com/slune-org/ts-transform-asset.git"
   },
   "scripts": {
     "prepublishOnly": "npm run all",
@@ -24,9 +24,11 @@
     "typescript",
     "transform",
     "asset",
-    "filename"
+    "filename",
+    "webpack",
+    "file-loader"
   ],
-  "author": "Stéphane Veyret",
+  "author": "Slune",
   "license": "MIT",
   "watch": {
     "test": {

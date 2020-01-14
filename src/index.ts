@@ -23,11 +23,13 @@ function buildVisitor(
   typeChecker: TypeChecker,
   ctx: TransformationContext,
   assetsMatch: RegExp,
-  targetPath?: string
+  targetName: string,
+  filename: string,
+  basePath: string
 ) {
   const modifiedImports: Node[] = []
   const declarationNode = new DeclarationNodeFinder(typeChecker)
-  const moduleManager = new AssetModuleManager(assetsMatch, targetPath)
+  const moduleManager = new AssetModuleManager(assetsMatch, targetName, filename, basePath)
   const allVisitors: Array<NodeVisitor<Node>> = [
     new ImportVisitor(declarationNode, moduleManager, modifiedImports),
     new ExportVisitor(moduleManager),
@@ -64,7 +66,12 @@ function buildVisitor(
 }
 
 export default function(program: Program, pluginConfig: PluginConfig): TransformerFactory<SourceFile> {
-  const assetsMatch: RegExp = new RegExp(pluginConfig.assetsMatch)
+  const assetsMatch = new RegExp(pluginConfig.assetsMatch)
+  const targetName = pluginConfig.targetName || '[hash].[ext]'
+  const basePath = program.getCompilerOptions().rootDir || program.getCurrentDirectory()
   return (ctx: TransformationContext): Transformer<SourceFile> => (sf: SourceFile) =>
-    visitNode(sf, buildVisitor(program.getTypeChecker(), ctx, assetsMatch, pluginConfig.targetPath))
+    visitNode(
+      sf,
+      buildVisitor(program.getTypeChecker(), ctx, assetsMatch, targetName, sf.fileName, basePath)
+    )
 }
