@@ -21,7 +21,7 @@ export const foobar = 'assets/foobar.ico'
 
 # Langue
 
-Le français étant ma langue maternelle, fournir les documents et messages en français n'est pas une option. Les autres traductions sont bienvenues.
+Le français étant ma langue maternelle, fournir les documents et messages en français est obligatoire. Les autres traductions sont bienvenues.
 
 Cependant, l'anglais étant la langue de la programmation, le code, y compris les noms de variable et commentaires, sont en anglais.
 
@@ -54,7 +54,7 @@ L'utilisation de ce transformateur pour transpiler les pages web (pas pour `Webp
 Le transformateur accepte les paramètres suivants :
 
 - `assetsMatch`: une expression rationnelle utilisée pour sélectionner les imports de fichiers annexes, par exemple, pour tous les fichiers `.png`, `assetsMatch = "\\.png$"` — ce paramètre est obligatoire;
-- `targetPath`: un chemin qui est préfixé au nom de fichier, c'est le `publicPath` que vous pouvez avoir défini dans le paramètre `output` de `Webpack` — ce paramètre est optionnel.
+- `targetName`: un patron similaire au [Webpack file-loader name](https://webpack.js.org/loaders/file-loader/#name) utilisé pour convertir le nom du fichier annexe — si vous définissez un `publicPath` dans le paramètre `output` de `Webpack`, vous aurez probablement besoin de spécifier ce chemin ici également — ce paramètre est optionnel et vaut `[hash].[ext]` par défaut.
 
 Il n'y a actuellement pas moyen de déclarer un transformateur dans le compilateur `typescript` standard. Si vous ne souhaitez pas écrire votre propre compilateur en utilisant l'API `typescript`, vous pouvez utiliser la surcouche `ttypescript`. Les explications sont données ci-dessous.
 
@@ -83,7 +83,7 @@ Ensuite, configurez votre `tsconfig.json`
       {
         "transform": "ts-transform-asset",
         "assetsMatch": "\\.png$",
-        "targetPath": "assets"
+        "targetName": "assets/[name]-[hash].[ext]"
       }
     ]
   }
@@ -155,4 +155,27 @@ const url: string = image
 
 # Migration
 
-Notez que dans les versions 1.x.x, le transformateur était de type `config`. Depuis la version 2.0.0, le transformateur est de type `program`, qui est le type par défaut. Si vous mettez à jour depuis une version plus ancienne et que vous utilisez `ttypescript`, vous devrez mettre à jour la configuration du `plugin` dans `tsconfig.json`.
+## Versions antérieures à 3.x.x
+
+Avant la version 3.x.x, il y avait une entrée de configuration nommée `targetPath` qui définissait un chemin préfixé au nom de fichier. Tout est maintenant défini par la nouvelle entrée `targetName`. La conversion d'une ancienne configuration vers la nouvelle est aussi simple que l'exemple ci-dessous :
+
+```diff
+       "transform": "ts-transform-asset",
+       "assetsMatch": "\\.png$",
+-      "targetPath": "assets"
++      "targetName": "assets/[name].[ext]"
+     }
+   ]
+```
+
+## Versions antérieur à 2.x.x
+
+En plus des modifications précédentes, notez qu'avant la version 2.x.x, le transformateur était de type `config`. Depuis la version 2.0.0, le transformateur est de type `program`, qui est le type par défaut. Si vous mettez à jour depuis une version plus ancienne et que vous utilisez `ttypescript`, vous devrez mettre à jour la configuration du `plugin` dans `tsconfig.json` :
+
+```diff
+     {
+       "transform": "ts-transform-asset",
+-      "type": "config",
+       "assetsMatch": "\\.png$",
+       "targetName": "assets/[name].[ext]"
+```

@@ -21,6 +21,7 @@ export default class DeclarationNodeFinder {
     const symbol = this.typeChecker.getSymbolAtLocation(node)
     if (symbol) {
       const declarations = symbol.getDeclarations()
+      /* istanbul ignore else */
       if (declarations && declarations.length === 1) {
         return declarations[0]
       }

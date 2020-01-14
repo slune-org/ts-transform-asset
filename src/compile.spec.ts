@@ -24,19 +24,21 @@ const TS_CONFIG: CompilerOptions = {
 
 export default function compile(
   testName: string,
+  rootDir: string | undefined,
   input: string[],
   assetsMatch: string,
-  targetPath?: string
+  targetName?: string
 ): void {
   const options: CompilerOptions = {
     ...TS_CONFIG,
+    rootDir,
     outDir: `dist/test/${testName}`,
   }
   const compilerHost = createCompilerHost(options)
   const program = createProgram(input, options, compilerHost)
 
   const emitResult = program.emit(undefined, undefined, undefined, undefined, {
-    before: [transform(program, { assetsMatch, targetPath })],
+    before: [transform(program, { assetsMatch, targetName })],
   })
 
   const allDiagnostics = getPreEmitDiagnostics(program).concat(emitResult.diagnostics)

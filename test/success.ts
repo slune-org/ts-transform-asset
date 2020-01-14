@@ -1,17 +1,19 @@
-import * as pngImage from './image.png'
+import * as pngImage from './sub/folder/image.png'
 import svgImage from './image.svg'
 import defaultImage from './reexport'
 import { image } from './reexport'
 
-export default function getPath(type: 'png' | 'svg' | 'defaultExport' | 'export'): string {
+export default function getPath(
+  type: 'fullImport' | 'defaultImport' | 'defaultExport' | 'namedExport'
+): string {
   switch (type) {
-    case 'png':
+    case 'fullImport':
       return pngImage
-    case 'svg':
+    case 'defaultImport':
       return svgImage
     case 'defaultExport':
       return defaultImage
-    case 'export':
+    case 'namedExport':
       return image
   }
 }
