@@ -22,6 +22,7 @@ export default class AssetModuleManager {
    * @returns The build module name or undefined if not matching.
    */
   public buildName(moduleSpecifier?: Expression): string | undefined {
+    /* istanbul ignore else */
     if (moduleSpecifier) {
       // Remove quotes for name
       let moduleName: string = moduleSpecifier.getText()

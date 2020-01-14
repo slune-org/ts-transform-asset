@@ -8,7 +8,8 @@ test/*.js
 .nyc_output/
 coverage/
 
-# Yarn
+# Npm and Yarn
+package-lock.json
 yarn-error.log
 yarn.lock
 
