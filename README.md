@@ -1,8 +1,8 @@
 [![npm package](https://badge.fury.io/js/ts-transform-asset.svg)](https://www.npmjs.com/package/ts-transform-asset)
-[![license](https://img.shields.io/github/license/slune-org/ts-transform-asset.svg)](https://github.com/slune-org/ts-transform-asset/blob/master/LICENSE)
-[![build](https://travis-ci.org/slune-org/ts-transform-asset.svg?branch=master)](https://travis-ci.com/slune-org/ts-transform-asset)
+[![License](https://img.shields.io/github/license/slune-org/ts-transform-asset.svg)](https://github.com/slune-org/ts-transform-asset/blob/master/LICENSE)
+[![Build Status](https://travis-ci.org/slune-org/ts-transform-asset.svg?branch=master)](https://travis-ci.org/slune-org/ts-transform-asset)
 [![Coverage Status](https://coveralls.io/repos/github/slune-org/ts-transform-asset/badge.svg?branch=master)](https://coveralls.io/github/slune-org/ts-transform-asset?branch=master)
-[![issues](https://img.shields.io/github/issues/slune-org/ts-transform-asset.svg)](https://github.com/slune-org/ts-transform-asset/issues)
+[![Issues](https://img.shields.io/github/issues/slune-org/ts-transform-asset.svg)](https://github.com/slune-org/ts-transform-asset/issues)
 
 # ts-transform-asset - Typescript transformer for asset imports
 
@@ -27,7 +27,7 @@ export const foobar = 'assets/foobar.ico'
 
 # Language/langue
 
-Because French is my native language, finding all documents and messages in French is mandatory. Other translations are welcome.
+Because Slune is French firm, you will find all documents and messages in French. Other translations are welcome.
 
 Anyway, because English is the language of programming, the code, including variable names and comments, are in English.
 
@@ -64,39 +64,7 @@ The transformer accepts the following parameters:
 - `assetsMatch`: a regular expression used to select asset imports, e.g., for all `.png` files, `assetsMatch = "\\.png$"`. This parameter is mandatory.
 - `targetName`: a template similar to [Webpack file-loader name](https://webpack.js.org/loaders/file-loader/#name) used to convert the name of the asset. If you defined a `publicPath` in the `output` parameter of `Webpack`, then you will probably need to specify this path here too. This parameter is optional and defaults to `[hash].[ext]`.
 
-There is currently no way of declaring a transformer in the vanilla `typescript` compiler. If you do not want to write your own compiler using the `typescript` API, you can use the `ttypescript` wrapper. Below is explained how.
-
-## Installation
-
-First of all, you need to install `ttypescript`, either with `npm`:
-
-```bash
-$ npm install --save-dev ttypescript
-```
-
-or with `yarn`:
-
-```bash
-$ yarn add --dev ttypescript
-```
-
-## Configuration
-
-Then, configure your `tsconfig.json`
-
-```json
-{
-  "compilerOptions": {
-    "plugins": [
-      {
-        "transform": "ts-transform-asset",
-        "assetsMatch": "\\.png$",
-        "targetName": "assets/[name]-[hash].[ext]"
-      }
-    ]
-  }
-}
-```
+There is currently no way of declaring a transformer in the vanilla _TypeScript_ compiler. If you do not want to write your own compiler using the `typescript` API, you can use the [ttypescript](https://www.npmjs.com/package/ttypescript) wrapper.
 
 ## Code
 
@@ -154,12 +122,30 @@ import * as image from './image.png'
 const url: string = image
 ```
 
+## Configuration with ttypescript
+
+For `ttypescript`, configure your `tsconfig.json`. Example:
+
+```json
+{
+  "compilerOptions": {
+    "plugins": [
+      {
+        "transform": "ts-transform-asset",
+        "assetsMatch": "\\.png$",
+        "targetName": "assets/[name]-[hash].[ext]"
+      }
+    ]
+  }
+}
+```
+
 # Notices
 
 - The transformer will not detect nor modify any `require` statement. It is advised to run it in the `before` phase of the compilation, before the code is converted to an older version of `ECMAScript`.
 - The transformer either modify the code if it conforms to what is expected, or do not touch it at all. There is an exception anyway for the re-export declarations: if the source module matches the given parameters, but the exported property is not `default`, then this export property will be removed.
-- Please file an issue if you have any problem using the transformer. Even if I cannot give a response time, I will do my best to correct problems or answer questions.
-- Contributions are of course always welcome.
+- Please file an issue if you have any problem using the transformer. Even though we cannot guarantee a response time, we will do our best to correct problems or answer questions.
+- Contributions (_pull request_) are welcome.
 
 # Migration
 

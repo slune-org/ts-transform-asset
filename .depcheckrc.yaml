@@ -1,0 +1,9 @@
+---
+specials:
+  - bin
+  - eslint
+  - istanbul
+  - mocha
+  - prettier
+ignore-dirs:
+  - __test__

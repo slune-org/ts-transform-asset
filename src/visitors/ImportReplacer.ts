@@ -1,3 +1,4 @@
+import { NodeVisitor } from 'simple-ts-transform'
 import {
   ImportClause,
   ImportDeclaration,
@@ -14,33 +15,20 @@ import {
   setSourceMapRange,
 } from 'typescript'
 
-import AssetModuleManager from './AssetModuleManager'
-import DeclarationNodeFinder from './DeclarationNodeFinder'
-import NodeVisitor from './NodeVisitor'
+import { TContext } from '../context'
 
 /**
- * Import visitor check if import needs to be replaced by a constant declaration.
+ * This visitor replace import by a constant declaration if needed.
  */
-export default class ImportVisitor implements NodeVisitor<ImportDeclaration> {
-  /**
-   * Create the visitor.
-   *
-   * @param declarationNode - The declaration node finder.
-   * @param moduleManager - The asset module manager.
-   * @param modifiedNodes - An array to record the modified imports.
-   */
-  public constructor(
-    private declarationNode: DeclarationNodeFinder,
-    private moduleManager: AssetModuleManager,
-    private modifiedNodes: Node[]
-  ) {}
+export default class ImportReplacer implements NodeVisitor<ImportDeclaration> {
+  public constructor(private readonly context: TContext) {}
 
-  public wantNode(node: Node): node is ImportDeclaration {
+  public wants(node: Node): node is ImportDeclaration {
     return isImportDeclaration(node)
   }
 
   public visit(node: ImportDeclaration): Node[] {
-    const moduleName = this.moduleManager.buildName(node.moduleSpecifier)
+    const moduleName = this.context.moduleManager.buildName(node.moduleSpecifier)
     if (moduleName) {
       // Get the import clause, and continue if needs to be modified
       const importClause: ImportClause | undefined = node.importClause
@@ -50,8 +38,8 @@ export default class ImportVisitor implements NodeVisitor<ImportDeclaration> {
       ) {
         // Create import replacement
         const identifier = importClause.name || (importClause.namedBindings as NamespaceImport).name
-        const declaration = this.declarationNode.find(identifier)
-        declaration && this.modifiedNodes.push(declaration)
+        const declaration = this.context.declarationNode.find(identifier)
+        declaration && this.context.modifiedImports.push(declaration)
         const variableDeclaration = createVariableDeclaration(
           identifier,
           undefined,

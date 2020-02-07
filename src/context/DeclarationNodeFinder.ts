@@ -9,7 +9,7 @@ export default class DeclarationNodeFinder {
    *
    * @param typeChecker - The type checker.
    */
-  public constructor(public typeChecker: TypeChecker) {}
+  public constructor(private readonly typeChecker: TypeChecker) {}
 
   /**
    * Search for the declaration node of a given identifier.

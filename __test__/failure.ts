@@ -6,4 +6,4 @@ export default function getData() {
 }
 
 export { ogg as sound } from './sound.ogg'
-export * from './skip.ogg'
+export * from './skip.svg'

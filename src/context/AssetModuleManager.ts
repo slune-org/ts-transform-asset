@@ -1,6 +1,6 @@
 import { HexBase64Latin1Encoding, createHash } from 'crypto'
 import { existsSync, readFileSync } from 'fs'
-import { basename, dirname, join, parse, relative, sep } from 'path'
+import { basename, join, parse, relative, sep } from 'path'
 import { Expression } from 'typescript'
 
 /**
@@ -9,26 +9,19 @@ import { Expression } from 'typescript'
  */
 export default class AssetModuleManager {
   /**
-   * The directory of the current file, root of module search.
-   */
-  private currentPath: string
-
-  /**
    * Create the object.
    *
    * @param assetsMatch - The regular expression for detecting matching modules.
    * @param targetName - The public target name to use for the assets.
-   * @param filename - The name of the file currently being transformed.
+   * @param currentPath - The directory of the current file, root of module search.
    * @param basePath - The base path of the project.
    */
   public constructor(
-    private assetsMatch: RegExp,
-    private targetName: string,
-    filename: string,
-    private basePath: string
-  ) {
-    this.currentPath = dirname(filename)
-  }
+    private readonly assetsMatch: RegExp,
+    private readonly targetName: string,
+    private readonly currentPath: string,
+    private readonly basePath: string
+  ) {}
 
   /**
    * Build the module name as it should be used inside source file, if the module specifier matches the
@@ -54,7 +47,9 @@ export default class AssetModuleManager {
 
   /**
    * Create the asset name using `targetName` template and given module name.
-   * @param moduleName The name of module to use as interpolation source.
+   *
+   * @param moduleName - The name of module to use as interpolation source.
+   * @returns The asset name.
    */
   private interpolateName(moduleName: string) {
     const modulePath = join(this.currentPath, moduleName)

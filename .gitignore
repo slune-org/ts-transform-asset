@@ -1,17 +1,16 @@
+# Distributable
 node_modules/
 dist/
-
-# Test results
-test/*.js
 
 # Coverage
 .nyc_output/
 coverage/
 
-# Npm and Yarn
+# Package managers
 package-lock.json
-yarn-error.log
 yarn.lock
+pnpm-lock.yaml
 
-# VS code
+# IDE
+*.code-workspace
 .vscode/

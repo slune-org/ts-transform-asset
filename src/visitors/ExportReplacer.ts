@@ -1,3 +1,4 @@
+import { NodeVisitor } from 'simple-ts-transform'
 import {
   ExportDeclaration,
   Node,
@@ -13,26 +14,20 @@ import {
   isExportDeclaration,
 } from 'typescript'
 
-import AssetModuleManager from './AssetModuleManager'
-import NodeVisitor from './NodeVisitor'
+import { TContext } from '../context'
 
 /**
- * Export visitor check if re-export needs to be replaced by a constant declaration.
+ * This visitor replace re-export by a constant declaration if needed.
  */
-export default class ExportVisitor implements NodeVisitor<ExportDeclaration> {
-  /**
-   * Create the visitor.
-   *
-   * @param moduleManager - The asset module manager.
-   */
-  public constructor(private moduleManager: AssetModuleManager) {}
+export default class ExportReplacer implements NodeVisitor<ExportDeclaration> {
+  public constructor(private readonly context: TContext) {}
 
-  public wantNode(node: Node): node is ExportDeclaration {
+  public wants(node: Node): node is ExportDeclaration {
     return isExportDeclaration(node)
   }
 
   public visit(node: ExportDeclaration): Node[] {
-    const moduleName = this.moduleManager.buildName(node.moduleSpecifier)
+    const moduleName = this.context.moduleManager.buildName(node.moduleSpecifier)
     if (moduleName) {
       if (node.exportClause) {
         const result: Node[] = []

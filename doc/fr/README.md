@@ -1,6 +1,6 @@
 # ts-transform-asset - Transformateur typescript pour l'import des fichiers annexes
 
-Ce transformateur se contente de convertir les imports tel que :
+Ce transformateur va simplement convertir les imports tel que :
 
 ```typescript
 import foo from './images/foo.gif'
@@ -21,7 +21,7 @@ export const foobar = 'assets/foobar.ico'
 
 # Langue
 
-Le français étant ma langue maternelle, fournir les documents et messages en français est obligatoire. Les autres traductions sont bienvenues.
+Slune étant une entreprise française, vous trouverez tous les documents et messages en français. Les autres traductions sont bienvenues.
 
 Cependant, l'anglais étant la langue de la programmation, le code, y compris les noms de variable et commentaires, sont en anglais.
 
@@ -56,39 +56,7 @@ Le transformateur accepte les paramètres suivants :
 - `assetsMatch`: une expression rationnelle utilisée pour sélectionner les imports de fichiers annexes, par exemple, pour tous les fichiers `.png`, `assetsMatch = "\\.png$"` — ce paramètre est obligatoire;
 - `targetName`: un patron similaire au [Webpack file-loader name](https://webpack.js.org/loaders/file-loader/#name) utilisé pour convertir le nom du fichier annexe — si vous définissez un `publicPath` dans le paramètre `output` de `Webpack`, vous aurez probablement besoin de spécifier ce chemin ici également — ce paramètre est optionnel et vaut `[hash].[ext]` par défaut.
 
-Il n'y a actuellement pas moyen de déclarer un transformateur dans le compilateur `typescript` standard. Si vous ne souhaitez pas écrire votre propre compilateur en utilisant l'API `typescript`, vous pouvez utiliser la surcouche `ttypescript`. Les explications sont données ci-dessous.
-
-## Installation
-
-Tout d'abord, il faut installer `ttypescript`, soit avec `npm`:
-
-```bash
-$ npm install --save-dev ttypescript
-```
-
-soit avec `yarn`:
-
-```bash
-$ yarn add --dev ttypescript
-```
-
-## Configuration
-
-Ensuite, configurez votre `tsconfig.json`
-
-```json
-{
-  "compilerOptions": {
-    "plugins": [
-      {
-        "transform": "ts-transform-asset",
-        "assetsMatch": "\\.png$",
-        "targetName": "assets/[name]-[hash].[ext]"
-      }
-    ]
-  }
-}
-```
+Il n'y a actuellement pas moyen de déclarer un transformateur dans le compilateur _TypeScript_ standard. Si vous ne souhaitez pas écrire votre propre compilateur en utilisant l'API `typescript`, vous pouvez utiliser la surcouche [ttypescript](https://www.npmjs.com/package/ttypescript).
 
 ## Code source
 
@@ -146,12 +114,30 @@ import * as image from './image.png'
 const url: string = image
 ```
 
+## Configuration avec ttypescript
+
+Pour `ttypescript`, configurez votre fichier `tsconfig.json`. Par exemple :
+
+```json
+{
+  "compilerOptions": {
+    "plugins": [
+      {
+        "transform": "ts-transform-asset",
+        "assetsMatch": "\\.png$",
+        "targetName": "assets/[name]-[hash].[ext]"
+      }
+    ]
+  }
+}
+```
+
 # Notes
 
 - Le transformateur ne détectera ni ne modifiera aucune instruction `require`. Il est conseillé de l'exécuter dans la phase de compilation `before`, avant que le code soit convertit dans une version plus ancienne d'`ECMAScript`.
 - Le transformateur modifie le code s'il est conforme à ce qui est attendu, ou ne le touche pas du tout. Il y a toutefois une exception pour les déclarations de ré-exports : si le module source correspond aux paramètres donnés mais que la propriété exportée n'est pas `default`, alors cet propriété sera supprimée.
-- Merci d'ouvrir un incident si vous avez un problème à l'utilisation de ce transformateur. Même si je ne peux pas garantir de délai de réponse, je ferai de mon mieux pour corriger les problèmes et répondre aux questions.
-- Les contributions sont bien sûr bienvenues.
+- Merci d'ouvrir un incident si vous avez un problème à l'utilisation de ce transformateur. Même si nous ne pouvons pas garantir de délai de réponse, nous ferons notre possible pour corriger les problèmes et répondre aux questions.
+- Les contributions (_pull request_) sont bienvenues.
 
 # Migration
 
