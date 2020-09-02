@@ -1,7 +1,8 @@
-import { HexBase64Latin1Encoding, createHash } from 'crypto'
+import type { HexBase64Latin1Encoding } from 'crypto'
+import { createHash } from 'crypto'
 import { existsSync, readFileSync } from 'fs'
 import { basename, join, parse, relative, sep } from 'path'
-import { Expression } from 'typescript'
+import type { Expression } from 'typescript'
 
 /**
  * Asset module manager can be used to detect asset modules and build a module name from a module
@@ -51,7 +52,7 @@ export default class AssetModuleManager {
    * @param moduleName - The name of module to use as interpolation source.
    * @returns The asset name.
    */
-  private interpolateName(moduleName: string) {
+  private interpolateName(moduleName: string): string {
     const modulePath = join(this.currentPath, moduleName)
     const parsed = parse(modulePath)
     /* istanbul ignore next */

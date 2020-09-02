@@ -1,20 +1,8 @@
-import { NodeVisitor } from 'simple-ts-transform'
-import {
-  ExportDeclaration,
-  Node,
-  NodeFlags,
-  SyntaxKind,
-  createExportDefault,
-  createStringLiteral,
-  createToken,
-  createVariableDeclaration,
-  createVariableDeclarationList,
-  createVariableStatement,
-  getGeneratedNameForNode,
-  isExportDeclaration,
-} from 'typescript'
+import type { NodeVisitor } from 'simple-ts-transform'
+import type { ExportDeclaration, Node } from 'typescript'
+import { NodeFlags, SyntaxKind, isExportDeclaration, isNamedExports } from 'typescript'
 
-import { TContext } from '../context'
+import type { TContext } from '../context'
 
 /**
  * This visitor replace re-export by a constant declaration if needed.
@@ -27,9 +15,18 @@ export default class ExportReplacer implements NodeVisitor<ExportDeclaration> {
   }
 
   public visit(node: ExportDeclaration): Node[] {
+    const {
+      createExportDefault,
+      createStringLiteral,
+      createToken,
+      createVariableDeclaration,
+      createVariableDeclarationList,
+      createVariableStatement,
+      getGeneratedNameForNode,
+    } = this.context.factory
     const moduleName = this.context.moduleManager.buildName(node.moduleSpecifier)
     if (moduleName) {
-      if (node.exportClause) {
+      if (node.exportClause && isNamedExports(node.exportClause)) {
         const result: Node[] = []
         node.exportClause.elements.forEach(specifier => {
           if (specifier.propertyName && specifier.propertyName.getText() === 'default') {
@@ -37,7 +34,14 @@ export default class ExportReplacer implements NodeVisitor<ExportDeclaration> {
               createVariableStatement(
                 [createToken(SyntaxKind.ExportKeyword)],
                 createVariableDeclarationList(
-                  [createVariableDeclaration(specifier.name, undefined, createStringLiteral(moduleName))],
+                  [
+                    createVariableDeclaration(
+                      specifier.name,
+                      undefined,
+                      undefined,
+                      createStringLiteral(moduleName)
+                    ),
+                  ],
                   NodeFlags.Const
                 )
               )
@@ -48,7 +52,14 @@ export default class ExportReplacer implements NodeVisitor<ExportDeclaration> {
               createVariableStatement(
                 undefined,
                 createVariableDeclarationList(
-                  [createVariableDeclaration(uniqueName, undefined, createStringLiteral(moduleName))],
+                  [
+                    createVariableDeclaration(
+                      uniqueName,
+                      undefined,
+                      undefined,
+                      createStringLiteral(moduleName)
+                    ),
+                  ],
                   NodeFlags.Const
                 )
               )

@@ -1,4 +1,4 @@
-import { Identifier, Node, TypeChecker } from 'typescript'
+import type { Identifier, Node, TypeChecker } from 'typescript'
 
 /**
  * An object searching for a declaration node for a given identifier.
