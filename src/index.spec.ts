@@ -15,7 +15,7 @@ describe('ts-transform-asset', function () {
       result: {
         fullImport: string
         defaultImport: string
-        moduleImport: string
+        moduleImport: string | undefined
         defaultExport: string
         namedExport: string
       }
@@ -26,7 +26,7 @@ describe('ts-transform-asset', function () {
       result: {
         fullImport: 'image.png',
         defaultImport: 'image.svg',
-        moduleImport: 'image.svg',
+        moduleImport: 'picture.svg',
         defaultExport: 'image.svg',
         namedExport: 'image.svg',
       },
@@ -36,16 +36,17 @@ describe('ts-transform-asset', function () {
       result: {
         fullImport: 'assets/image.png',
         defaultImport: 'assets/image.svg',
-        moduleImport: 'assets/image.svg',
+        moduleImport: 'assets/picture.svg',
         defaultExport: 'assets/image.svg',
         namedExport: 'assets/image.svg',
       },
     },
     default: {
+      rootDir: '__test__',
       result: {
         fullImport: '[hash].png',
         defaultImport: 'b05767c238cb9f989cf3cd8180594878.svg',
-        moduleImport: '[hash].svg',
+        moduleImport: 'bee0f4fbbfd53e62289432b4a070cd03.svg',
         defaultExport: 'b05767c238cb9f989cf3cd8180594878.svg',
         namedExport: 'b05767c238cb9f989cf3cd8180594878.svg',
       },
@@ -56,7 +57,8 @@ describe('ts-transform-asset', function () {
       result: {
         fullImport: 'sub/folder/folder_[hash]-[contenthash].png',
         defaultImport: '_b05767c238cb9f989cf3cd8180594878-b05767c238cb9f989cf3cd8180594878.svg',
-        moduleImport: 'module/module_[hash]-[contenthash].svg',
+        moduleImport:
+          'node_modules/dummy/dummy_bee0f4fbbfd53e62289432b4a070cd03-bee0f4fbbfd53e62289432b4a070cd03.svg',
         defaultExport: '_b05767c238cb9f989cf3cd8180594878-b05767c238cb9f989cf3cd8180594878.svg',
         namedExport: '_b05767c238cb9f989cf3cd8180594878-b05767c238cb9f989cf3cd8180594878.svg',
       },
@@ -67,7 +69,7 @@ describe('ts-transform-asset', function () {
         fullImport: '__test__/sub/folder/folder_[hash]-[contenthash].png',
         defaultImport:
           '__test__/__test___b05767c238cb9f989cf3cd8180594878-b05767c238cb9f989cf3cd8180594878.svg',
-        moduleImport: '__test__/module/module_[hash]-[contenthash].svg',
+        moduleImport: undefined,
         defaultExport:
           '__test__/__test___b05767c238cb9f989cf3cd8180594878-b05767c238cb9f989cf3cd8180594878.svg',
         namedExport:
@@ -109,24 +111,30 @@ describe('ts-transform-asset', function () {
         result.print()
       })
 
-      it('should find full module import file', function () {
-        expect(result.requireContent('success')('fullImport')).to.equal(testCase.result.fullImport)
-      })
+      Array.of('success', 'package/success').forEach(file => {
+        describe(`...in file ${file}`, function () {
+          it('should find full module import file', function () {
+            expect(result.requireContent(file)('fullImport')).to.equal(testCase.result.fullImport)
+          })
 
-      it('should find default module import file', function () {
-        expect(result.requireContent('success')('defaultImport')).to.equal(testCase.result.defaultImport)
-      })
+          it('should find default module import file', function () {
+            expect(result.requireContent(file)('defaultImport')).to.equal(testCase.result.defaultImport)
+          })
 
-      it('should find external module file', function () {
-        expect(result.requireContent('success')('moduleImport')).to.equal(testCase.result.moduleImport)
-      })
+          if (testCase.result.moduleImport) {
+            it('should find external module file', function () {
+              expect(result.requireContent(file)('moduleImport')).to.equal(testCase.result.moduleImport)
+            })
+          }
 
-      it('should find default re-exported file', function () {
-        expect(result.requireContent('success')('defaultExport')).to.equal(testCase.result.defaultExport)
-      })
+          it('should find default re-exported file', function () {
+            expect(result.requireContent(file)('defaultExport')).to.equal(testCase.result.defaultExport)
+          })
 
-      it('should find named re-exported file', function () {
-        expect(result.requireContent('success')('namedExport')).to.equal(testCase.result.namedExport)
+          it('should find named re-exported file', function () {
+            expect(result.requireContent(file)('namedExport')).to.equal(testCase.result.namedExport)
+          })
+        })
       })
 
       it('should fail to require bad module', function () {

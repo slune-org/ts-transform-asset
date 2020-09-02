@@ -40,7 +40,7 @@ export default class AssetModuleManager {
 
       // Check if matching assets pattern
       if (this.assetsMatch.test(moduleName)) {
-        return this.interpolateName(moduleName)
+        return this.interpolateName(this.findModulePath(moduleName))
       }
     }
     return undefined
@@ -49,11 +49,10 @@ export default class AssetModuleManager {
   /**
    * Create the asset name using `targetName` template and given module name.
    *
-   * @param moduleName - The name of module to use as interpolation source.
+   * @param modulePath - The path of module to use as interpolation source.
    * @returns The asset name.
    */
-  private interpolateName(moduleName: string): string {
-    const modulePath = join(this.currentPath, moduleName)
+  private interpolateName(modulePath: string): string {
     const parsed = parse(modulePath)
     /* istanbul ignore next */
     const ext = parsed.ext ? parsed.ext.substr(1) : 'bin'
@@ -90,5 +89,21 @@ export default class AssetModuleManager {
       .replace(/\[path\]/gi, directory)
       .replace(/\[folder\]/gi, folder)
     return url
+  }
+
+  /**
+   * Find the module path, using default node resolution, or simply searching relative to current file.
+   *
+   * @param moduleName - The name of the module to find.
+   * @returns The module path.
+   */
+  private findModulePath(moduleName: string): string {
+    try {
+      return require.resolve(moduleName, {
+        paths: [this.basePath],
+      })
+    } catch {
+      return join(this.currentPath, moduleName)
+    }
   }
 }
