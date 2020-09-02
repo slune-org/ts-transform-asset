@@ -4,7 +4,7 @@ import Compiler, { CompilationResult } from 'ts-transform-test-compiler'
 
 import transformer from '.'
 
-describe('ts-transform-asset', function() {
+describe('ts-transform-asset', function () {
   this.slow(2000)
   this.timeout(10000)
 
@@ -12,7 +12,13 @@ describe('ts-transform-asset', function() {
     [name: string]: {
       rootDir?: string
       template?: string
-      result: { fullImport: string; defaultImport: string; defaultExport: string; namedExport: string }
+      result: {
+        fullImport: string
+        defaultImport: string
+        moduleImport: string
+        defaultExport: string
+        namedExport: string
+      }
     }
   } = {
     root: {
@@ -20,6 +26,7 @@ describe('ts-transform-asset', function() {
       result: {
         fullImport: 'image.png',
         defaultImport: 'image.svg',
+        moduleImport: 'image.svg',
         defaultExport: 'image.svg',
         namedExport: 'image.svg',
       },
@@ -29,6 +36,7 @@ describe('ts-transform-asset', function() {
       result: {
         fullImport: 'assets/image.png',
         defaultImport: 'assets/image.svg',
+        moduleImport: 'assets/image.svg',
         defaultExport: 'assets/image.svg',
         namedExport: 'assets/image.svg',
       },
@@ -37,6 +45,7 @@ describe('ts-transform-asset', function() {
       result: {
         fullImport: '[hash].png',
         defaultImport: 'b05767c238cb9f989cf3cd8180594878.svg',
+        moduleImport: '[hash].svg',
         defaultExport: 'b05767c238cb9f989cf3cd8180594878.svg',
         namedExport: 'b05767c238cb9f989cf3cd8180594878.svg',
       },
@@ -47,6 +56,7 @@ describe('ts-transform-asset', function() {
       result: {
         fullImport: 'sub/folder/folder_[hash]-[contenthash].png',
         defaultImport: '_b05767c238cb9f989cf3cd8180594878-b05767c238cb9f989cf3cd8180594878.svg',
+        moduleImport: 'module/module_[hash]-[contenthash].svg',
         defaultExport: '_b05767c238cb9f989cf3cd8180594878-b05767c238cb9f989cf3cd8180594878.svg',
         namedExport: '_b05767c238cb9f989cf3cd8180594878-b05767c238cb9f989cf3cd8180594878.svg',
       },
@@ -57,6 +67,7 @@ describe('ts-transform-asset', function() {
         fullImport: '__test__/sub/folder/folder_[hash]-[contenthash].png',
         defaultImport:
           '__test__/__test___b05767c238cb9f989cf3cd8180594878-b05767c238cb9f989cf3cd8180594878.svg',
+        moduleImport: '__test__/module/module_[hash]-[contenthash].svg',
         defaultExport:
           '__test__/__test___b05767c238cb9f989cf3cd8180594878-b05767c238cb9f989cf3cd8180594878.svg',
         namedExport:
@@ -66,7 +77,7 @@ describe('ts-transform-asset', function() {
   }
   const compiler = new Compiler(transformer, 'dist/__test__')
 
-  describe('Configuration problems', function() {
+  describe('Configuration problems', function () {
     const badConfigurationCases: {
       [name: string]: { config: any; message: RegExp }
     } = {
@@ -79,16 +90,18 @@ describe('ts-transform-asset', function() {
       },
     }
     Object.entries(badConfigurationCases).forEach(([name, { config, message }]) => {
-      it(`should throw an error if ${name}`, function() {
+      it(`should throw an error if ${name}`, function () {
         expect(() => compiler.setRootDir('__test__').compile('config', config)).to.throw(message)
       })
     })
   })
 
   Object.entries(testCases).forEach(([name, testCase]) => {
-    describe(`Compile with ${testCase.template || 'default'} template`, function() {
+    describe(`Compile with ${testCase.template || 'default'} template${
+      testCase.rootDir ? ` in ${testCase.rootDir}` : ''
+    }`, function () {
       let result: CompilationResult
-      before(`Compile files to ${name}`, function() {
+      before(`Compile files to ${name}`, function () {
         result = compiler
           .setRootDir(testCase.rootDir)
           .setSourceFiles(testCase.rootDir ? '/' : '__test__/')
@@ -96,23 +109,27 @@ describe('ts-transform-asset', function() {
         result.print()
       })
 
-      it('should find full module import file', function() {
+      it('should find full module import file', function () {
         expect(result.requireContent('success')('fullImport')).to.equal(testCase.result.fullImport)
       })
 
-      it('should find default module import file', function() {
+      it('should find default module import file', function () {
         expect(result.requireContent('success')('defaultImport')).to.equal(testCase.result.defaultImport)
       })
 
-      it('should find default re-exported file', function() {
+      it('should find external module file', function () {
+        expect(result.requireContent('success')('moduleImport')).to.equal(testCase.result.moduleImport)
+      })
+
+      it('should find default re-exported file', function () {
         expect(result.requireContent('success')('defaultExport')).to.equal(testCase.result.defaultExport)
       })
 
-      it('should find named re-exported file', function() {
+      it('should find named re-exported file', function () {
         expect(result.requireContent('success')('namedExport')).to.equal(testCase.result.namedExport)
       })
 
-      it('should fail to require bad module', function() {
+      it('should fail to require bad module', function () {
         expect(() => result.requireContent('failure')).to.throw()
       })
     })

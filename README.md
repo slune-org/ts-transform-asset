@@ -27,9 +27,9 @@ export const foobar = 'assets/foobar.ico'
 
 # Language/langue
 
-Because Slune is French firm, you will find all documents and messages in French. Other translations are welcome.
+Documents, messages, code (including variable names and comments), are in English.
 
-Anyway, because English is the language of programming, the code, including variable names and comments, are in English.
+Anyway, because Slune is French firm, all documents and important messages must also be provided in French. Other translations are welcome.
 
 :fr: Une version française de ce document se trouve [ici](doc/fr/README.md).
 
@@ -39,12 +39,6 @@ Installation is done using `npm install` command:
 
 ```bash
 $ npm install --save-dev ts-transform-asset
-```
-
-If you prefer using `yarn`:
-
-```bash
-$ yarn add --dev ts-transform-asset
 ```
 
 # Why would I need that?
@@ -144,8 +138,6 @@ For `ttypescript`, configure your `tsconfig.json`. Example:
 
 - The transformer will not detect nor modify any `require` statement. It is advised to run it in the `before` phase of the compilation, before the code is converted to an older version of `ECMAScript`.
 - The transformer either modify the code if it conforms to what is expected, or do not touch it at all. There is an exception anyway for the re-export declarations: if the source module matches the given parameters, but the exported property is not `default`, then this export property will be removed.
-- Please file an issue if you have any problem using the transformer. Even though we cannot guarantee a response time, we will do our best to correct problems or answer questions.
-- Contributions (_pull request_) are welcome.
 
 # Migration
 
@@ -173,3 +165,9 @@ In addition to the previous modifications, note that prior to version 2.x.x, tra
        "assetsMatch": "\\.png$",
        "targetName": "assets/[name].[ext]"
 ```
+
+# Contributing
+
+Even though we cannot guarantee a response time, please feel free to file an issue if you have any question or problem using the package.
+
+_Pull Requests_ are welcome. You can, of course, submit corrections or improvements for code, but do not hesitate to also improve documentation, even for small spell or grammar errors.

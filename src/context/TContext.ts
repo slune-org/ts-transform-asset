@@ -1,6 +1,6 @@
 import { dirname } from 'path'
-import { NodeVisitorContext } from 'simple-ts-transform'
-import { Node, Program, SourceFile } from 'typescript'
+import type { NodeVisitorContext } from 'simple-ts-transform'
+import type { Node, NodeFactory, Program, SourceFile, TransformationContext } from 'typescript'
 
 import AssetModuleManager from './AssetModuleManager'
 import DeclarationNodeFinder from './DeclarationNodeFinder'
@@ -22,7 +22,7 @@ function configurationError(message: string): never {
 function assertIsConfiguration(
   configuration: any
 ): asserts configuration is { assetsMatch: string; targetName?: string } {
-  if (typeof configuration !== 'object') {
+  if (typeof configuration !== 'object' || !configuration) {
     configurationError('configuration must be an object')
   }
   if (!('assetsMatch' in configuration)) {
@@ -58,12 +58,17 @@ export default class TContext implements NodeVisitorContext {
   /**
    * The imports modified in the file currently being visited.
    */
-  private currentModifiedImports: Node[] = []
+  private currentModifiedImports!: Node[]
 
   /**
    * The module manager for the file currently being visited.
    */
-  private currentModuleManager?: AssetModuleManager
+  private currentModuleManager!: AssetModuleManager
+
+  /**
+   * The node factory.
+   */
+  private currentFactory!: NodeFactory
 
   /**
    * The type checker.
@@ -76,7 +81,7 @@ export default class TContext implements NodeVisitorContext {
    * @param program - The program object.
    * @param configuration - The provided configuration.
    */
-  public constructor(program: Program, configuration: any) {
+  public constructor(program: Program, configuration: unknown) {
     assertIsConfiguration(configuration)
     this.assetsMatch = new RegExp(configuration.assetsMatch)
     this.targetName = configuration.targetName || '[hash].[ext]'
@@ -84,7 +89,7 @@ export default class TContext implements NodeVisitorContext {
     this.declarationNode = new DeclarationNodeFinder(program.getTypeChecker())
   }
 
-  public initNewFile(_context: any, sourceFile: SourceFile): void {
+  public initNewFile(context: TransformationContext, sourceFile: SourceFile): void {
     this.currentModifiedImports = []
     this.currentModuleManager = new AssetModuleManager(
       this.assetsMatch,
@@ -92,6 +97,7 @@ export default class TContext implements NodeVisitorContext {
       dirname(sourceFile.fileName),
       this.basePath
     )
+    this.currentFactory = context.factory
   }
 
   public get modifiedImports(): Node[] {
@@ -99,10 +105,10 @@ export default class TContext implements NodeVisitorContext {
   }
 
   public get moduleManager(): AssetModuleManager {
-    /* istanbul ignore if */
-    if (!this.currentModuleManager) {
-      throw new Error('Asset module manager is being called before initialization')
-    }
     return this.currentModuleManager
+  }
+
+  public get factory(): NodeFactory {
+    return this.currentFactory
   }
 }
