@@ -1,6 +1,7 @@
 # Binaries
 node_modules/
 dist/
+!__test__/node_modules
 
 # Coverage
 .nyc_output/
